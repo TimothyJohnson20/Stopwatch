@@ -3,6 +3,7 @@ package com.example.stopwatch;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -12,7 +13,8 @@ public class MainActivity extends AppCompatActivity {
     private Button startStop;
     private Button reset;
     private Chronometer stopWatch;
-
+    private boolean isOn;
+    private long lastNumber;
     private void wireWidgets() {
         startStop = findViewById(R.id.button_main_start_stop);
         reset = findViewById(R.id.button_main_reset);
@@ -28,10 +30,28 @@ public class MainActivity extends AppCompatActivity {
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                stopWatch.setBase(SystemClock.elapsedRealtime());
 
             }
-        });
 
+        });
+        startStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isOn) {
+                    isOn = true;
+                    startStop.setText(R.string.main_stop);
+                    stopWatch.start();
+                    stopWatch.setBase(stopWatch.getBase() + (SystemClock.elapsedRealtime() - lastNumber));
+                }
+                else{
+                    isOn = false;
+                    startStop.setText(R.string.main_start);
+                    stopWatch.stop();
+                    lastNumber = SystemClock.elapsedRealtime();
+                }
+            }
+        });
     }
 
 
@@ -46,6 +66,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: ");
+        isOn = false;
+        wireWidgets();
+        setListeners();
+        lastNumber = SystemClock.elapsedRealtime();
     }
     @Override
     protected void onStart() {

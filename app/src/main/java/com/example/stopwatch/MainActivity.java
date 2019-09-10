@@ -1,7 +1,9 @@
 package com.example.stopwatch;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -15,23 +17,20 @@ public class MainActivity extends AppCompatActivity {
     private Chronometer stopWatch;
     private boolean isOn;
     private long lastNumber;
+    private ConstraintLayout constraintLayout;
     private void wireWidgets() {
         startStop = findViewById(R.id.button_main_start_stop);
         reset = findViewById(R.id.button_main_reset);
         stopWatch = findViewById(R.id.chronometer_main_time);
+        constraintLayout = findViewById(R.id.constraint_mian);
     }
     private void setListeners() {
-        startStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stopWatch.start();
-            }
-        });
+
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 stopWatch.setBase(SystemClock.elapsedRealtime());
-
+                lastNumber = SystemClock.elapsedRealtime();
             }
 
         });
@@ -70,6 +69,11 @@ public class MainActivity extends AppCompatActivity {
         wireWidgets();
         setListeners();
         lastNumber = SystemClock.elapsedRealtime();
+        int r = (int)(Math.random() * 256);
+        int g = (int)(Math.random() * 256);
+        int bl = (int)(Math.random() * 256);
+        int color = Color.rgb(r, g, bl);
+        constraintLayout.setBackgroundColor(color);
     }
     @Override
     protected void onStart() {

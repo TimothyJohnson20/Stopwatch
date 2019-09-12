@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private long lastNumber;
     private ConstraintLayout constraintLayout;
     public static final String KEY_CHRONOMETER_BASE = "chronometer base";
+    private boolean saveOn;
     private void wireWidgets() {
         startStop = findViewById(R.id.button_main_start_stop);
         reset = findViewById(R.id.button_main_reset);
@@ -81,7 +82,15 @@ public class MainActivity extends AppCompatActivity {
         //  to decide to start it or not in onCreate
         if(savedInstanceState != null){
             stopWatch.setBase(savedInstanceState.getLong(KEY_CHRONOMETER_BASE));
-            stopWatch.start();
+            if (isOn){
+                stopWatch.start();
+                startStop.setText(R.string.main_stop);
+            }
+            else{
+                stopWatch.stop();
+                startStop.setText(R.string.main_start);
+            }
+
         }
     }
     @Override
@@ -121,5 +130,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(KEY_CHRONOMETER_BASE, stopWatch.getBase());
+        saveOn = isOn;
     }
 }

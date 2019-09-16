@@ -19,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
     private long lastNumber;
     private ConstraintLayout constraintLayout;
     public static final String KEY_CHRONOMETER_BASE = "chronometer base";
-    private boolean saveOn;
+    public static final String KEY_CHRONOMETER_STOPPED = "chronometer stopped";
+
     private void wireWidgets() {
         startStop = findViewById(R.id.button_main_start_stop);
         reset = findViewById(R.id.button_main_reset);
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (!isOn) {
                     isOn = true;
-                    startStop.setText(R.string.main_stop);
+                    startStop.setText(getString(R.string.main_stop));
                     stopWatch.start();
                     stopWatch.setBase(stopWatch.getBase() + (SystemClock.elapsedRealtime() - lastNumber));
                 }
@@ -57,7 +58,13 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
     //  Look up the Log class for Android
     //  List all the levels of logging and when they're used
+
     //  Verbose - Debug - Info - Warning - Error - Assert
+    //  When app is launched - OnCreate, onStart, onResume
+    //  When app is closed - onPause, onStop
+    //  When app is opened again - onStart, onResume
+    //  When app is destroyed - onStop, onDestroy
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,12 +73,14 @@ public class MainActivity extends AppCompatActivity {
         isOn = false;
         wireWidgets();
         setListeners();
+        //region backgroundcolor
         lastNumber = SystemClock.elapsedRealtime();
         int r = (int)(Math.random() * 256);
         int g = (int)(Math.random() * 256);
         int bl = (int)(Math.random() * 256);
         int color = Color.rgb(r, g, bl);
         constraintLayout.setBackgroundColor(color);
+        //endregion
 
         //  if the savedInstanceState isn't null
         //  pull out the value of the base that we saved from the bundle
@@ -82,15 +91,18 @@ public class MainActivity extends AppCompatActivity {
         //  to decide to start it or not in onCreate
         if(savedInstanceState != null){
             stopWatch.setBase(savedInstanceState.getLong(KEY_CHRONOMETER_BASE));
-            if (isOn){
-                stopWatch.start();
-                startStop.setText(R.string.main_stop);
+            isOn = savedInstanceState.getBoolean(KEY_CHRONOMETER_STOPPED);
+            if (!isOn){
+                stopWatch.stop();
+                startStop.setText(getString(R.string.main_start));
+
             }
             else{
-                stopWatch.stop();
-                startStop.setText(R.string.main_start);
-            }
+                stopWatch.start();
+                startStop.setText(R.string.main_stop);
+                lastNumber = SystemClock.elapsedRealtime();
 
+            }
         }
     }
     @Override
@@ -130,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(KEY_CHRONOMETER_BASE, stopWatch.getBase());
-        saveOn = isOn;
+        outState.putBoolean(KEY_CHRONOMETER_STOPPED, isOn);
+
     }
 }
